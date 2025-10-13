@@ -4,22 +4,44 @@
       {
         "tag": "local",
         "type": "udp",
-        "server": "223.5.5.5"
+        "server": "223.5.5.5",
+        "strategy": "ipv4_only"
       },
       {
         "tag": "public",
         "type": "https",
         "server": "dns.alidns.com",
-        "domain_resolver": "local"
+        "domain_resolver": "local",
+        "strategy": "prefer_ipv4"
       },
       {
         "tag": "foreign",
         "type": "https",
         "server": "8.8.8.8",
-        "detour": "🚀 默认代理"
+        "detour": "🚀 默认代理",
+        "strategy": "prefer_ipv4"
+      },
+      {
+        "tag": "adblock",
+        "type": "https",
+        "server": "https://dns.adguard-dns.com/dns-query",
+        "detour": "🎯 全球直连"
+      },
+      {
+        "tag": "block",
+        "address": "rcode://success"
       }
     ],
     "rules": [
+      {
+        "rule_set": ["geosite-ads"],
+        "server": "block",
+        "disable_cache": true
+      },
+      {
+        "domain_keyword": ["ads", "tracking", "analytics", "doubleclick"],
+        "server": "block"
+      },
       {
         "clash_mode": "direct",
         "server": "local"
@@ -59,6 +81,7 @@
       "tag": "🚀 默认代理",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇭🇰 香港手动",
         "🇯🇵 日本手动",
         "🇸🇬 狮城手动",
@@ -68,9 +91,24 @@
       ]
     },
     {
+      "tag": "⚡ 低延迟优选",
+      "type": "urltest",
+      "outbounds": ["{all}"],
+      "filter": [
+        {
+          "action": "exclude",
+          "keywords": ["官网", "到期时间", "剩余", "流量", "套餐", "免费", "订阅", "全球直连", "GB", "Expire Date", "Traffic", "ExpireDate"]
+        }
+      ],
+      "interval": "3m",
+      "tolerance": 30,
+      "interrupt_exist_connections": false
+    },
+    {
       "tag": "🧠 AI",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇯🇵 日本手动",
         "🇸🇬 狮城手动",
         "🇺🇲 美国手动"
@@ -80,6 +118,7 @@
       "tag": "📹 YouTube",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇭🇰 香港手动",
         "🇯🇵 日本手动",
         "🇸🇬 狮城手动",
@@ -91,6 +130,7 @@
       "tag": "🍀 Google",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇭🇰 香港手动",
         "🇯🇵 日本手动",
         "🇸🇬 狮城手动",
@@ -102,6 +142,7 @@
       "tag": "👨‍💻 Github",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇯🇵 日本手动",
         "🇭🇰 香港手动",
         "🇸🇬 狮城手动",
@@ -113,6 +154,7 @@
       "tag": "📲 Telegram",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇸🇬 狮城手动",
         "🇭🇰 香港手动",
         "🇯🇵 日本手动",
@@ -124,6 +166,7 @@
       "tag": "🎵 TikTok",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇯🇵 日本手动",
         "🇸🇬 狮城手动",
         "🇺🇲 美国手动",
@@ -134,6 +177,7 @@
       "tag": "🎥 Netflix",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇭🇰 香港手动",
         "🇯🇵 日本手动",
         "🇸🇬 狮城手动",
@@ -156,6 +200,7 @@
       "tag": "🎮 Steam",
       "type": "selector",
       "outbounds": [
+        "⚡ 低延迟优选",
         "🇭🇰 香港手动",
         "🇯🇵 日本手动",
         "🇸🇬 狮城手动",
@@ -309,13 +354,16 @@
           ]
         }
       ],
-      "interval": "10m",
-      "tolerance": 100
+      "interval": "5m",
+      "tolerance": 50
     },
     {
       "tag": "🍃 延迟辅助",
       "type": "urltest",
-      "outbounds": ["🚀 默认代理", "🎯 全球直连"]
+      "outbounds": [
+        "🚀 默认代理",
+        "🎯 全球直连"
+      ]
     },
     {
       "tag": "GLOBAL",
@@ -346,6 +394,10 @@
       ]
     },
     {
+      "tag": "🛑 广告拦截",
+      "type": "block"
+    },
+    {
       "tag": "🎯 全球直连",
       "type": "direct"
     }
@@ -353,12 +405,24 @@
   "route": {
     "rules": [
       {
-        "action": "sniff",
+        "action": "sniff", 
         "sniffer": ["http", "tls", "quic", "dns"]
       },
       {
-        "inbound": "dns-in",
+        "inbound": "dns-in", 
         "action": "hijack-dns"
+      },
+      {
+        "rule_set": ["geosite-ads"],
+        "outbound": "🛑 广告拦截"
+      },
+      {
+        "domain_keyword": [
+          "ads", "tracking", "analytics", "doubleclick", 
+          "googleadservices", "googlesyndication",
+          "facebook.com/tr", "google-analytics"
+        ],
+        "outbound": "🛑 广告拦截"
       },
       {
         "ip_is_private": true,
@@ -454,6 +518,14 @@
       }
     ],
     "rule_set": [
+      {
+        "tag": "geosite-ads",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://cdn.jsdelivr.net/gh/AdGuardTeam/AdguardFilters@master/filters/sing-box/adservers.srs",
+        "download_detour": "🎯 全球直连",
+        "update_interval": "24h"
+      },
       {
         "tag": "geosite-ai",
         "type": "remote",
@@ -631,13 +703,17 @@
       "tag": "http-in",
       "type": "http",
       "listen": "::",
-      "listen_port": 8080
+      "listen_port": 8080,
+      "tcp_fast_open": true,
+      "tcp_multi_path": true
     },
     {
       "tag": "socks-in",
       "type": "socks",
       "listen": "::",
-      "listen_port": 1080
+      "listen_port": 1080,
+      "tcp_fast_open": true,
+      "tcp_multi_path": true
     },
     {
       "tag": "redirect-in",
@@ -660,14 +736,18 @@
         "fdfe:dcba:9876::1/126"
       ],
       "auto_route": false,
-      "auto_redirect": false
+      "auto_redirect": false,
+      "mtu": 9000,
+      "stack": "system",
+      "endpoint_independent_nat": false
     }
   ],
   "experimental": {
     "cache_file": {
       "enabled": true,
       "path": "/etc/momo/run/cache.db",
-      "store_fakeip": false
+      "store_fakeip": false,
+      "cache_id": "momo_v2"
     },
     "clash_api": {
       "external_controller": "0.0.0.0:9095",
@@ -681,6 +761,14 @@
   "log": {
     "disabled": false,
     "level": "info",
-    "timestamp": true
+    "timestamp": true,
+    "output": "/var/log/momo/sing-box.log"
+  },
+  "ntp": {
+    "enabled": true,
+    "server": "time.apple.com",
+    "server_port": 123,
+    "interval": "30m",
+    "detour": "🎯 全球直连"
   }
 }
