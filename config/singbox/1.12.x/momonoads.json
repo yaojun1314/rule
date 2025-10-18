@@ -12,7 +12,18 @@
       {"domain_suffix": ["services.googleapis.cn", "googleapis.cn", "xn--ngstr-lra8j.com"], "server": "foreign"},
       {"rule_set": ["geosite-cn", "geosite-steamcn", "geosite-apple"], "server": "local"},
       {"domain_suffix": ["emby.media", "emby.io"], "server": "🇭🇰 香港手动"},
-      {"domain_keyword": ["ads", "adservice", "doubleclick", "googlesyndication", "admob", "adsafeprotected"], "server": "🎯 全球直连"}
+      {"domain_suffix": [
+        "googlesyndication.com",
+        "doubleclick.net",
+        "adservice.google.com",
+        "googleads.g.doubleclick.net",
+        "googletagmanager.com",
+        "admob.com",
+        "advertising.com",
+        "pubmatic.com",
+        "criteo.net",
+        "criteo.com"
+      ], "server": "fakeip"}
     ],
     "final": "foreign",
     "strategy": "ipv4_only",
@@ -74,7 +85,18 @@
       {"rule_set": "geoip-telegram", "outbound": "📲 Telegram"},
       {"rule_set": "geoip-netflix", "outbound": "🎥 Netflix"},
       {"rule_set": "geoip-cn", "outbound": "🎯 全球直连"},
-      {"domain_keyword": ["ads", "adservice", "doubleclick", "googlesyndication", "admob", "adsafeprotected"], "outbound": "🎯 全球直连"}
+      {"domain_suffix": [
+        "googlesyndication.com",
+        "doubleclick.net",
+        "adservice.google.com",
+        "googleads.g.doubleclick.net",
+        "googletagmanager.com",
+        "admob.com",
+        "advertising.com",
+        "pubmatic.com",
+        "criteo.net",
+        "criteo.com"
+      ], "outbound": "fakeip"}
     ],
     "rule_set": [
       {"tag": "geosite-ai", "type": "remote", "format": "binary", "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-ai-!cn.srs", "download_detour": "🎯 全球直连"},
